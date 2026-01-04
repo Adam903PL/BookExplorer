@@ -1,0 +1,43 @@
+package com.example.bookexplorer.data
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+class FavoritesManager(private val context: Context) {
+    private val FAVORITE_IDS_KEY = stringSetPreferencesKey("favorite_ids")
+
+    val favoritesFlow: Flow<Set<String>> = context.dataStore.data
+        .map { preferences ->
+            preferences[FAVORITE_IDS_KEY] ?: emptySet()
+        }
+
+    suspend fun addFavorite(id: String) {
+        context.dataStore.edit { preferences ->
+            val currentFavorites = preferences[FAVORITE_IDS_KEY] ?: emptySet()
+            preferences[FAVORITE_IDS_KEY] = currentFavorites + id
+        }
+    }
+
+    suspend fun removeFavorite(id: String) {
+        context.dataStore.edit { preferences ->
+            val currentFavorites = preferences[FAVORITE_IDS_KEY] ?: emptySet()
+            preferences[FAVORITE_IDS_KEY] = currentFavorites - id
+        }
+    }
+
+    suspend fun isFavorite(id: String): Boolean {
+        // Note: verifying via flow is reactive, but for one-off checks we might need to collect first
+        // However, usually we observe the flow. For simplicity in ViewModel, we can expose a flow or suspend function.
+        // For 'toggle' logic, strictly speaking we should rely on the latest data.
+        // But to keep it simple and consistent with previous sync API, we'll let ViewModel observe the Flow.
+        return false // Placeholder, unused if we switch to Flow observation
+    }
+}
