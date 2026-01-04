@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 interface OpenLibraryApi {
 
     @GET("subjects/fiction.json")
-    suspend fun getFictionBooks(@Query("limit") limit: Int = 20): BookResponse
+    suspend fun getFictionBooks(@Query("limit") limit: Int = 20, @Query("offset") offset: Int = 0): BookResponse
 
     @GET("works/{id}.json")
     suspend fun getBookDetails(@Path("id") id: String): BookDetail

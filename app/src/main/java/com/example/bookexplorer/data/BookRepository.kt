@@ -6,9 +6,9 @@ import java.io.IOException
 class BookRepository {
     private val api = NetworkModule.api
 
-    suspend fun getFictionBooks(): Result<List<BookWork>> {
+    suspend fun getFictionBooks(limit: Int = 20, offset: Int = 0): Result<List<BookWork>> {
         return try {
-            val response = api.getFictionBooks()
+            val response = api.getFictionBooks(limit, offset)
             Result.success(response.works)
         } catch (e: Exception) {
             Result.failure(e)

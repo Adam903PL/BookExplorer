@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,7 +48,7 @@ fun HomeScreen(
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
-        onRefresh = { viewModel.loadBooks() }
+        onRefresh = { viewModel.loadBooks(reset = true) }
     )
 
     Box(modifier = Modifier
@@ -56,7 +58,7 @@ fun HomeScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
-                     if (!isRefreshing) {
+                     if (!isRefreshing && (state as? HomeUiState.Loading)?.let { true } == true) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
@@ -64,7 +66,12 @@ fun HomeScreen(
                 }
                 is HomeUiState.Success -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(state.books) { book ->
+                        itemsIndexed(state.books) { index, book ->
+                            if (index >= state.books.size - 1) {
+                                LaunchedEffect(Unit) {
+                                    viewModel.loadNextPage()
+                                }
+                            }
                             BookListItem(book = book, onClick = { 
                                 val bookId = book.key.substringAfterLast("/")
                                 onBookClick(bookId) 
@@ -77,7 +84,7 @@ fun HomeScreen(
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(text = "Error: ${state.message}", color = MaterialTheme.colorScheme.error)
-                                Button(onClick = { viewModel.loadBooks() }) {
+                                Button(onClick = { viewModel.loadBooks(reset = true) }) {
                                     Text("Retry")
                                 }
                             }

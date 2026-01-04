@@ -22,22 +22,51 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
 
-    val isRefreshing: StateFlow<Boolean> = _uiState.map { it is HomeUiState.Loading }
+    val isRefreshing: StateFlow<Boolean> = _uiState.map { it is HomeUiState.Loading && (it as? HomeUiState.Success)?.books?.isEmpty() == true }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    private var currentOffset = 0
+    private var isLastPage = false
+    private var isLoadingMore = false
+
     init {
-        loadBooks()
+        loadBooks(reset = true)
     }
 
-    fun loadBooks() {
-        viewModelScope.launch {
+    fun loadBooks(reset: Boolean = false) {
+        if (isLoadingMore) return
+
+        if (reset) {
+            currentOffset = 0
+            isLastPage = false
             _uiState.value = HomeUiState.Loading
-            val result = repository.getFictionBooks()
-            result.onSuccess { books ->
-                _uiState.value = HomeUiState.Success(books)
-            }.onFailure { e ->
-                _uiState.value = HomeUiState.Error(e.message ?: "Unknown error")
-            }
         }
+
+        if (isLastPage) return
+
+        isLoadingMore = true
+        viewModelScope.launch {
+            val result = repository.getFictionBooks(offset = currentOffset)
+            result.onSuccess { books ->
+                if (books.isEmpty()) {
+                    isLastPage = true
+                } else {
+                    currentOffset += books.size
+                    val currentBooks = (_uiState.value as? HomeUiState.Success)?.books ?: emptyList()
+                    val newBooks = if (reset) books else currentBooks + books
+                    _uiState.value = HomeUiState.Success(newBooks)
+                }
+            }.onFailure { e ->
+                if (reset) {
+                    _uiState.value = HomeUiState.Error(e.message ?: "Unknown error")
+                }
+                // Handle pagination error silently or with a snackbar side-effect if needed
+            }
+            isLoadingMore = false
+        }
+    }
+
+    fun loadNextPage() {
+        loadBooks(reset = false)
     }
 }
