@@ -30,9 +30,7 @@ class FavoritesViewModel(application: Application) : AndroidViewModel(applicatio
     fun loadFavorites() {
         viewModelScope.launch {
             _uiState.value = FavoritesUiState.Loading
-            // Get single snapshot for loading list. 
-            // Real-time updates could be done by collecting the flow, but simple load is okay for now.
-            val favoriteIds = favoritesManager.favoritesFlow.first()
+             val favoriteIds = favoritesManager.favoritesFlow.first()
             
             if (favoriteIds.isEmpty()) {
                 _uiState.value = FavoritesUiState.Empty

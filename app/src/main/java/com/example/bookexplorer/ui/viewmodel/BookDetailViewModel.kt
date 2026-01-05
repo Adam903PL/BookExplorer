@@ -28,7 +28,6 @@ class BookDetailViewModel(application: Application, private val workId: String) 
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState
 
-    // Observe Favorites Flow directly
     val isFavorite: StateFlow<Boolean> = favoritesManager.favoritesFlow
         .map { it.contains(workId) }
         .stateIn(
@@ -55,7 +54,7 @@ class BookDetailViewModel(application: Application, private val workId: String) 
 
     fun toggleFavorite() {
         viewModelScope.launch {
-            // Check current value from StateFlow
+
             if (isFavorite.value) {
                 favoritesManager.removeFavorite(workId)
             } else {

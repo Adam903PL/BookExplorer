@@ -17,6 +17,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -47,7 +48,8 @@ import com.example.bookexplorer.ui.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
-    onBookClick: (String) -> Unit
+    onBookClick: (String) -> Unit,
+    onInfoClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -115,6 +117,14 @@ fun HomeScreen(
                                 disabledContainerColor = MaterialTheme.colorScheme.surface,
                             )
                         )
+
+                        androidx.compose.material3.IconButton(onClick = onInfoClick) {
+                            androidx.compose.material3.Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.Info,
+                                contentDescription = "Info",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
@@ -138,7 +148,7 @@ fun HomeScreen(
                             }
                             BookListItem(book = book, onClick = { 
                                 val bookId = book.key.substringAfterLast("/")
-                                onBookClick(bookId) 
+                                onBookClick(bookId)
                             })
                         }
                     }

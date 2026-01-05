@@ -33,6 +33,7 @@ import com.example.bookexplorer.ui.home.HomeScreen
 
 sealed class Screen(val route: String, val title: String) {
     object Home : Screen("home", "Book Explorer")
+    object Info : Screen("info", "Information")
     object Favorites : Screen("favorites", "Favorites")
     object Detail : Screen("detail/{bookId}", "Book Details") {
         fun createRoute(bookId: String) = "detail/$bookId"
@@ -126,7 +127,15 @@ fun BookApp(
                 HomeScreen(
                     onBookClick = { bookId ->
                         navController.navigate(Screen.Detail.createRoute(bookId))
+                    },
+                    onInfoClick = {
+                        navController.navigate(Screen.Info.route)
                     }
+                )
+            }
+            composable(Screen.Info.route) {
+                com.example.bookexplorer.ui.info.InfoScreen(
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Favorites.route) {

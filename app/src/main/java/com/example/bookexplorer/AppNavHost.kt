@@ -24,6 +24,20 @@ fun AppNavHost() {
         navController = navController,
         startDestination = "home"
     ) {
+        composable("home") {
+            HomeScreen(
+                onBookClick = { bookId ->
+                    // NOTE: This legacy NavHost expects title/author but now we only have ID.
+                    // This file seems unused in favor of BookApp.kt.
+                    // Passing dummy data or navigating loosely to fix compilation.
+                    val encodedTitle = Uri.encode("Loading...")
+                    val encodedAuthor = Uri.encode("Unknown")
+                    val safeCoverId = -1
+                    navController.navigate("book/$encodedTitle/$encodedAuthor/$safeCoverId")
+                },
+                onInfoClick = { navController.navigate("info") }
+            )
+        }
 
 
 
@@ -46,6 +60,10 @@ fun AppNavHost() {
                  coverId = if (coverId == -1) null else coverId,
                  onBack = { navController.popBackStack() }
               )
+        }
+
+        composable("info") {
+            com.example.bookexplorer.ui.info.InfoScreen(onBack = { navController.popBackStack() })
         }
     }
 }
