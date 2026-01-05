@@ -11,7 +11,9 @@ data class BookWork(
     val title: String,
     val authors: List<Author>?,
     @SerializedName("cover_id") val coverId: Long?,
-    @SerializedName("first_publish_year") val firstPublishYear: Int?
+    @SerializedName("first_publish_year") val firstPublishYear: Int?,
+    val subject: List<String>?,
+    @SerializedName("edition_count") val editionCount: Int?
 )
 
 data class Author(
@@ -22,7 +24,9 @@ data class BookDetail(
     val title: String,
     val description: Any?,
     val covers: List<Long>?,
-    @SerializedName("number_of_pages") val numberOfPages: Int?
+    @SerializedName("number_of_pages") val numberOfPages: Int?,
+    val subjects: List<String>?,
+    @SerializedName("first_publish_date") val firstPublishDate: String?
 ) {
     fun getDescriptionText(): String {
         return when (description) {

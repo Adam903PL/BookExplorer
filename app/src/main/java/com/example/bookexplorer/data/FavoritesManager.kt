@@ -34,10 +34,6 @@ class FavoritesManager(private val context: Context) {
     }
 
     suspend fun isFavorite(id: String): Boolean {
-        // Note: verifying via flow is reactive, but for one-off checks we might need to collect first
-        // However, usually we observe the flow. For simplicity in ViewModel, we can expose a flow or suspend function.
-        // For 'toggle' logic, strictly speaking we should rely on the latest data.
-        // But to keep it simple and consistent with previous sync API, we'll let ViewModel observe the Flow.
-        return false // Placeholder, unused if we switch to Flow observation
+        return false 
     }
 }

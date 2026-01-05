@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -36,6 +38,7 @@ import com.example.bookexplorer.ui.viewmodel.BookDetailViewModel
 import com.example.bookexplorer.ui.viewmodel.BookDetailViewModelFactory
 import com.example.bookexplorer.ui.viewmodel.DetailUiState
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BookDetailScreen(
     workId: String,
@@ -60,8 +63,7 @@ fun BookDetailScreen(
             }
             is DetailUiState.Success -> {
                 val book = state.book
-                
-                // Cover Image
+   
                 val coverUrl = book.covers?.firstOrNull()?.let { "https://covers.openlibrary.org/b/id/$it-L.jpg" }
                 if (coverUrl != null) {
                     AsyncImage(
@@ -79,7 +81,7 @@ fun BookDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Title and Favorite Button
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -100,14 +102,38 @@ fun BookDetailScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Additional Info
+                if (book.firstPublishDate != null) {
+                    Text(text = "First Published: ${book.firstPublishDate}", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 if (book.numberOfPages != null) {
                     Text(text = "Pages: ${book.numberOfPages}", style = MaterialTheme.typography.bodyMedium)
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+
+                book.subjects?.let { subjects ->
+                    if (subjects.isNotEmpty()) {
+                        Text(text = "Subjects:", style = MaterialTheme.typography.labelLarge)
+                        androidx.compose.foundation.layout.FlowRow(
+                             modifier = Modifier.fillMaxWidth(),
+                             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp)
+                        ) {
+                            subjects.take(10).forEach { subject ->
+                                androidx.compose.material3.AssistChip(
+                                    onClick = {},
+                                    label = { Text(subject) }
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Description
+
                 Text(text = "Description", style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = book.getDescriptionText().ifEmpty { "No description available." },
