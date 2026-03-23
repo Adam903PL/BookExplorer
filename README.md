@@ -2,7 +2,7 @@
 
 # 📚 BookExplorer
 
-**BookExplorer** is a mobile application built in Kotlin that connects to an external API to fetch and display the latest books.
+BookExplorer is a mobile application built in Kotlin that connects to an external API to fetch and display the latest books.
 
 The app provides a simple and flexible way to explore books with various filtering and browsing options.
 
